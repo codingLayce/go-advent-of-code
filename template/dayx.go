@@ -6,7 +6,7 @@ type Dayx struct {
 
 func New() Dayx {
 	return Dayx{
-		Input: "201x/dayx/input.txt",
+		Input: "202x/dayx/input.txt",
 	}
 }
 
