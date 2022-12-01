@@ -21,7 +21,8 @@ func main() {
 		fmt.Printf("Puzzle 1: ERROR %v\n", err)
 		return
 	}
-	fmt.Printf("Puzzle 1: %v (execution in %s)\n", res1, timeTrackStr(start))
+	exec1 := timeTrackStr(start)
+	fmt.Printf("Puzzle 1: %v (executed in %s)\n", res1, exec1)
 
 	start = time.Now()
 	res2, err := current.ProcessPuzzle2(data)
@@ -29,7 +30,10 @@ func main() {
 		fmt.Printf("Puzzle 1: ERROR %v\n", err)
 		return
 	}
-	fmt.Printf("Puzzle 2: %v (execution in %s)\n", res2, timeTrackStr(start))
+	exec2 := timeTrackStr(start)
+	fmt.Printf("Puzzle 2: %v (executed in %s)\n", res2, exec2)
+
+	_ = common.WriteResults(current.Dir, [2]string{res1, res2}, [2]string{exec1, exec2})
 }
 
 func timeTrackStr(start time.Time) string {

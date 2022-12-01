@@ -8,16 +8,18 @@ import (
 )
 
 type Day1 struct {
+	Dir   string
 	Input string
 }
 
 func New() Day1 {
 	return Day1{
 		Input: "2022/day1/input.txt",
+		Dir:   "2022/day1/",
 	}
 }
 
-func (d Day1) ProcessPuzzle1(lines []string) (interface{}, error) {
+func (d Day1) ProcessPuzzle1(lines []string) (string, error) {
 	var (
 		maxCarrying     = 0
 		currentCarrying = 0
@@ -35,10 +37,10 @@ func (d Day1) ProcessPuzzle1(lines []string) (interface{}, error) {
 		}
 	}
 
-	return maxCarrying, nil
+	return fmt.Sprintf("%d", maxCarrying), nil
 }
 
-func (d Day1) ProcessPuzzle2(lines []string) (interface{}, error) {
+func (d Day1) ProcessPuzzle2(lines []string) (string, error) {
 	elves := make([]int, 3)
 	current := 0
 	for _, line := range lines {
@@ -56,7 +58,7 @@ func (d Day1) ProcessPuzzle2(lines []string) (interface{}, error) {
 	elves = replaceMin(elves, current)
 	fmt.Printf("%v\n", elves)
 
-	return slices.Sum(elves), nil
+	return fmt.Sprintf("%d", slices.Sum(elves)), nil
 }
 
 func replaceMin(slice []int, value int) []int {
