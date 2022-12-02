@@ -1,0 +1,2 @@
+PUZZLE 1: 15572 (executed in 270 µs)
+PUZZLE 2: 16098 (executed in 250 µs)n 47 ns)
