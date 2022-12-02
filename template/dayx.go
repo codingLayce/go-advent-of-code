@@ -2,11 +2,13 @@ package dayx
 
 type Dayx struct {
 	Input string
+	Dir   string
 }
 
 func New() Dayx {
 	return Dayx{
 		Input: "202x/dayx/input.txt",
+		Dir:   "202x/dayx/",
 	}
 }
 
