@@ -12,10 +12,10 @@ func New() Dayx {
 	}
 }
 
-func (d Dayx) ProcessPuzzle1(lines []string) (interface{}, error) {
+func (d Dayx) ProcessPuzzle1(lines []string) (string, error) {
 	return "not implemented", nil
 }
 
-func (d Dayx) ProcessPuzzle2(lines []string) (interface{}, error) {
+func (d Dayx) ProcessPuzzle2(lines []string) (string, error) {
 	return "not implemented", nil
 }
