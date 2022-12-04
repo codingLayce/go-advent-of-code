@@ -3,21 +3,21 @@ package math
 import "fmt"
 
 type Vector2 struct {
-	x int
-	y int
+	X int
+	Y int
 }
 
 func NewVector2(x, y int) Vector2 {
 	return Vector2{
-		x: x,
-		y: y,
+		X: x,
+		Y: y,
 	}
 }
 
 func (v Vector2) Equal(other Vector2) bool {
-	return v.x == other.x && v.y == other.y
+	return v.X == other.X && v.Y == other.Y
 }
 
 func (v Vector2) ToString() string {
-	return fmt.Sprintf("%s:%s", v.x, v.y)
+	return fmt.Sprintf("%s:%s", v.X, v.Y)
 }
