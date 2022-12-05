@@ -1,0 +1,2 @@
+PUZZLE 1: VQZNJMWTR (executed in 200 µs)
+PUZZLE 2: NLCDCLVMQ (executed in 425 µs) ns)) ns))

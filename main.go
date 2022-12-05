@@ -1,15 +1,15 @@
 package main
 
 import (
+	"adc/2022/day5"
 	"fmt"
 	"time"
 
-	"adc/2022/day4"
 	"adc/common"
 )
 
 func main() {
-	current := day4.New()
+	current := day5.New()
 	data, err := common.ReadInput(current.Input)
 	if err != nil {
 		fmt.Printf("Error while reading input: %v\n", err)
