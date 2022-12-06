@@ -26,8 +26,8 @@ func (d Day6) ProcessPuzzle2(lines []string) (string, error) {
 }
 
 func foundDistinctChars(value string, length int) string {
-	for i := 0; i < len(value)-length; i++ {
-		current := value[i : i+length]
+	for i := length; i < len(value); i++ {
+		current := value[i-length : i]
 		ok := true
 		for _, char := range current {
 			occurence := strings.CountOccurrence(current, string(char))
@@ -37,7 +37,7 @@ func foundDistinctChars(value string, length int) string {
 			}
 		}
 		if ok {
-			return fmt.Sprintf("%d", i+length)
+			return fmt.Sprintf("%d", i)
 		}
 	}
 	return ""
