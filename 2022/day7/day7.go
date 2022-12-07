@@ -86,19 +86,19 @@ func (d Day7) ProcessPuzzle2(lines []string) (string, error) {
 	root.computeSize()
 
 	needs := 30000000 - (70000000 - root.size)
-	candidates := foundDeleteCandidate(root, needs)
+	candidates := foundDeletableCandidates(root, needs)
 	_, min := slices.Min(candidates)
 
 	return fmt.Sprintf("%d", min), nil
 }
 
-func foundDeleteCandidate(dir Dir, needs uint64) []uint64 {
+func foundDeletableCandidates(dir Dir, needs uint64) []uint64 {
 	var all []uint64
 	if dir.size >= needs {
 		all = append(all, dir.size)
 	}
 	for _, child := range dir.children {
-		all = append(all, foundDeleteCandidate(*child, needs)...)
+		all = append(all, foundDeletableCandidates(*child, needs)...)
 	}
 	return all
 }
@@ -129,11 +129,7 @@ func parseFileSystem(lines []string) Dir {
 	}
 	currentDir := root
 
-	for idx, line := range lines {
-		if idx == 0 {
-			continue
-		}
-
+	for _, line := range lines[1:] {
 		// $ <command>
 		if line[0] == uint8('$') {
 			// ls
@@ -150,6 +146,11 @@ func parseFileSystem(lines []string) Dir {
 			// cd <dir>
 			idx := strings.LastIndex(line, " ") + 1
 			currentDir = currentDir.addDir(line[idx:])
+			continue
+		}
+
+		// dir <dir>
+		if line[0] == uint8('d') {
 			continue
 		}
 
