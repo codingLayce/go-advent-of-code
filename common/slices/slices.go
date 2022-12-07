@@ -1,5 +1,7 @@
 package slices
 
+import "math"
+
 func Contains[T comparable](slice []T, element T) bool {
 	for _, e := range slice {
 		if e == element {
@@ -28,4 +30,16 @@ func Max(slice []int) (int, int) {
 		}
 	}
 	return idx, max
+}
+
+func Min(slice []uint64) (int, uint64) {
+	idx := 0
+	min := uint64(math.MaxUint64)
+	for i, e := range slice {
+		if e < min {
+			min = e
+			idx = i
+		}
+	}
+	return idx, min
 }
