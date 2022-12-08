@@ -1,6 +1,9 @@
 package strings
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 func CountOccurrence(str string, sub string) int {
 	count := 0
@@ -28,4 +31,15 @@ func RemoveMultiple(str string, toRemove ...string) string {
 		tmp = strings.ReplaceAll(tmp, element, "")
 	}
 	return tmp
+}
+
+func ToIntSlice(str string) []int {
+	var arr []int
+
+	for _, e := range str {
+		value, _ := strconv.Atoi(string(e))
+		arr = append(arr, value)
+	}
+
+	return arr
 }

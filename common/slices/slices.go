@@ -32,7 +32,19 @@ func Max(slice []int) (int, int) {
 	return idx, max
 }
 
-func Min(slice []uint64) (int, uint64) {
+func MinInt(slice []int) (int, int) {
+	idx := 0
+	min := math.MaxInt
+	for i, e := range slice {
+		if e < min {
+			min = e
+			idx = i
+		}
+	}
+	return idx, min
+}
+
+func MinUint(slice []uint64) (int, uint64) {
 	idx := 0
 	min := uint64(math.MaxUint64)
 	for i, e := range slice {

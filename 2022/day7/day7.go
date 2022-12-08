@@ -87,7 +87,7 @@ func (d Day7) ProcessPuzzle2(lines []string) (string, error) {
 
 	needs := 30000000 - (70000000 - root.size)
 	candidates := foundDeletableCandidates(root, needs)
-	_, min := slices.Min(candidates)
+	_, min := slices.MinUint(candidates)
 
 	return fmt.Sprintf("%d", min), nil
 }
