@@ -1,10 +1,11 @@
 package day8
 
 import (
-	"adc/common/slices"
-	"adc/common/strings"
 	"fmt"
 	"strconv"
+
+	"adc/common/slices"
+	"adc/common/strings"
 )
 
 type Day8 struct {
@@ -34,7 +35,70 @@ func (d Day8) ProcessPuzzle1(lines []string) (string, error) {
 }
 
 func (d Day8) ProcessPuzzle2(lines []string) (string, error) {
-	return "not implemented", nil
+	maxScenic := 0
+	width := len(lines[0])
+	height := len(lines)
+
+	for row := 0; row < height; row++ {
+		for col := 0; col < width; col++ {
+			if score := scenicScore(lines, row, col, width, height); score > maxScenic {
+				maxScenic = score
+			}
+		}
+	}
+
+	return fmt.Sprintf("%d", maxScenic), nil
+}
+
+func scenicScore(lines []string, row, col, width, height int) int {
+	score := 1
+	tree, _ := strconv.Atoi(string(lines[row][col]))
+
+	// Right
+	view := 0
+	for i := col + 1; i < width; i++ {
+		view++
+		cur, _ := strconv.Atoi(string(lines[row][i]))
+		if cur >= tree {
+			break
+		}
+	}
+	score *= view
+
+	// Left
+	view = 0
+	for i := col - 1; i >= 0; i-- {
+		view++
+		cur, _ := strconv.Atoi(string(lines[row][i]))
+		if cur >= tree {
+			break
+		}
+	}
+	score *= view
+
+	// Top
+	view = 0
+	for i := row - 1; i >= 0; i-- {
+		view++
+		cur, _ := strconv.Atoi(string(lines[i][col]))
+		if cur >= tree {
+			break
+		}
+	}
+	score *= view
+
+	// Bottom
+	view = 0
+	for i := row + 1; i < height; i++ {
+		view++
+		cur, _ := strconv.Atoi(string(lines[i][col]))
+		if cur >= tree {
+			break
+		}
+	}
+	score *= view
+
+	return score
 }
 
 func isVisible(lines []string, row, col, width, height int) int {
@@ -58,7 +122,7 @@ func isVisible(lines []string, row, col, width, height int) int {
 
 	// tree --> top
 	var toTop []int
-	for i := row-1;i >=0; i-- {
+	for i := row - 1; i >= 0; i-- {
 		value, _ := strconv.Atoi(string(lines[i][col]))
 		toTop = append(toTop, value)
 	}
@@ -68,7 +132,7 @@ func isVisible(lines []string, row, col, width, height int) int {
 
 	// tree --> bottom
 	var toBottom []int
-	for i := row+1;i < height; i++ {
+	for i := row + 1; i < height; i++ {
 		value, _ := strconv.Atoi(string(lines[i][col]))
 		toBottom = append(toBottom, value)
 	}
