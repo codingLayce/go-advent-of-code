@@ -20,6 +20,22 @@ func New() Day8 {
 	}
 }
 
+func parseBoard(lines []string) ([][]int, int, int) {
+	width := len(lines[0])
+	height := len(lines)
+	var board [][]int
+
+	for row := 0; row < height; row++ {
+		board = append(board, []int{})
+		for col := 0; col < width; col++ {
+			value, _ := strconv.Atoi(string(lines[row][col]))
+			board[row] = append(board[row], value)
+		}
+	}
+
+	return board, width, height
+}
+
 func (d Day8) ProcessPuzzle1(lines []string) (string, error) {
 	total := 0
 	width := len(lines[0])
@@ -36,12 +52,11 @@ func (d Day8) ProcessPuzzle1(lines []string) (string, error) {
 
 func (d Day8) ProcessPuzzle2(lines []string) (string, error) {
 	maxScenic := 0
-	width := len(lines[0])
-	height := len(lines)
+	board, width, height := parseBoard(lines)
 
 	for row := 0; row < height; row++ {
 		for col := 0; col < width; col++ {
-			if score := scenicScore(lines, row, col, width, height); score > maxScenic {
+			if score := scenicScore(board, row, col, width, height); score > maxScenic {
 				maxScenic = score
 			}
 		}
@@ -50,53 +65,48 @@ func (d Day8) ProcessPuzzle2(lines []string) (string, error) {
 	return fmt.Sprintf("%d", maxScenic), nil
 }
 
-func scenicScore(lines []string, row, col, width, height int) int {
+func scenicScoreForDirection(max int, view []int) int {
+	for idx, tree := range view {
+		if tree >= max {
+			return idx + 1
+		}
+	}
+	return len(view)
+}
+
+func scenicScore(board [][]int, row, col, width, height int) int {
 	score := 1
-	tree, _ := strconv.Atoi(string(lines[row][col]))
+	tree := board[row][col]
 
-	// Right
-	view := 0
-	for i := col + 1; i < width; i++ {
-		view++
-		cur, _ := strconv.Atoi(string(lines[row][i]))
-		if cur >= tree {
-			break
-		}
+	if col != width-1 {
+		score *= scenicScoreForDirection(tree, board[row][col+1:])
 	}
-	score *= view
 
-	// Left
-	view = 0
-	for i := col - 1; i >= 0; i-- {
-		view++
-		cur, _ := strconv.Atoi(string(lines[row][i]))
-		if cur >= tree {
-			break
-		}
+	if col != 0 {
+		score *= scenicScoreForDirection(tree, slices.Reverse(board[row][:col]))
 	}
-	score *= view
 
-	// Top
-	view = 0
-	for i := row - 1; i >= 0; i-- {
-		view++
-		cur, _ := strconv.Atoi(string(lines[i][col]))
-		if cur >= tree {
-			break
+	if row != height-1 {
+		view := 0
+		for _, line := range board[row+1:] {
+			view++
+			if tree >= line[col] {
+				break
+			}
 		}
+		score *= view
 	}
-	score *= view
 
-	// Bottom
-	view = 0
-	for i := row + 1; i < height; i++ {
-		view++
-		cur, _ := strconv.Atoi(string(lines[i][col]))
-		if cur >= tree {
-			break
+	if row != 0 {
+		view := 0
+		for _, line := range slices.Reverse(board[:row]) {
+			view++
+			if tree >= line[col] {
+				break
+			}
 		}
+		score *= view
 	}
-	score *= view
 
 	return score
 }
