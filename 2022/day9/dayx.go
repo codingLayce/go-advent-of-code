@@ -66,9 +66,9 @@ func move(rope []math.Vector2, direction string, steps int, tailIdx int) ([]math
 			tail := rope[idx]
 			delta := math.NewVector2(int(gomath.Abs(float64(head.X-tail.X))), int(gomath.Abs(float64(head.Y-tail.Y))))
 			if delta.X == 2 || delta.Y == 2 { // knots aren't touching anymore
-				if delta.X == 2 {
-					rope[idx].X = (tail.X + head.X) / 2
-				} else {
+				if delta.X == 2 { // head: 5 tail: 3 delta: 2
+					rope[idx].X = (tail.X + head.X) / 2 // 5+3=8/2=4 (tail is not touching head)
+				} else { // move forward
 					rope[idx].X = head.X
 				}
 				if delta.Y == 2 {
