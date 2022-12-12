@@ -1,2 +1,2 @@
-PUZZLE 1: 10914 (executed in 172 µs)
-PUZZLE 2: not implemented (executed in 33 ns)in 41 ns))(executed in 125 ns)41 ns)
+PUZZLE 1: 66802 (executed in 505 µs)
+PUZZLE 2: 21800916620 (executed in 27 ms))))))in 41 ns))(executed in 125 ns)41 ns)

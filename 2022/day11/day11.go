@@ -14,30 +14,28 @@ type Day11 struct {
 
 func New() Day11 {
 	return Day11{
-		Input: "2022/day11/example.txt",
+		Input: "2022/day11/input.txt",
 		Dir:   "2022/day11/",
 	}
 }
 
 type Monkey struct {
-	items     []int
-	inspected int
-	op        func(current int) int
-	test      func(current int) int
-}
-
-func (m *Monkey) String() string {
-	return fmt.Sprintf("<items:%v | inspected:%d>", m.items, m.inspected)
+	items        []uint64
+	inspected    int
+	op           func(current uint64) uint64
+	worriedLevel func(current uint64) uint64
+	test         func(current uint64) int
+	modulo       int
 }
 
 // return newValue, index
-func (m *Monkey) inspect() (int, int) {
+func (m *Monkey) inspect(lambda func(uint64) uint64) (uint64, int) {
 	item := m.items[0]
 	m.items = m.items[1:]
 	m.inspected++
 
 	worryLevel := m.op(item)
-	worryLevel /= 3
+	worryLevel = lambda(worryLevel)
 
 	return worryLevel, m.test(worryLevel)
 }
@@ -45,24 +43,9 @@ func (m *Monkey) inspect() (int, int) {
 func (d Day11) ProcessPuzzle1(lines []string) (string, error) {
 	monkeys := parseMonkeys(lines)
 
-	for i := 0; i < 20; i++ {
-		for idx, _ := range monkeys {
-			for len(monkeys[idx].items) != 0 {
-				item, toThrow := monkeys[idx].inspect()
-				monkeys[toThrow].items = append(monkeys[toThrow].items, item)
-			}
-		}
-
-		for _, monkey := range monkeys {
-			fmt.Printf("%s\n", monkey.String())
-		}
-		fmt.Println()
-	}
-
-	var inspected []int
-	for _, monkey := range monkeys {
-		inspected = append(inspected, monkey.inspected)
-	}
+	inspected := process(monkeys, 20, func(u uint64) uint64 {
+		return u / 3
+	})
 
 	sort.Ints(inspected)
 
@@ -70,7 +53,41 @@ func (d Day11) ProcessPuzzle1(lines []string) (string, error) {
 }
 
 func (d Day11) ProcessPuzzle2(lines []string) (string, error) {
-	return "not implemented", nil
+	monkeys := parseMonkeys(lines)
+
+	// Pour la seconde partie, le problème qui va se poser est que les nombres seront beaucoup trop grands pour être stocké
+	// Il faut donc trouver un moyen de réduire l'"item" sans compromettre le test (divisible).
+	// Il faut donc trouver le plus petit diviseur common des tests.
+	// Or ceux-ci sont tous des nombres premier, du coup le plus petit diviseur common est le produit de ceux-ci.
+	lcm := monkeys[0].modulo
+	for i := 1; i < len(monkeys); i++ {
+		lcm *= monkeys[i].modulo
+	}
+
+	inspected := process(monkeys, 10000, func(u uint64) uint64 {
+		return u % uint64(lcm)
+	})
+	sort.Ints(inspected)
+
+	return fmt.Sprintf("%d", inspected[len(inspected)-1]*inspected[len(inspected)-2]), nil
+}
+
+func process(monkeys []Monkey, rounds int, lambda func(uint64) uint64) []int {
+	for i := 0; i < rounds; i++ {
+		for idx := range monkeys {
+			for len(monkeys[idx].items) != 0 {
+				item, toThrow := monkeys[idx].inspect(lambda)
+				monkeys[toThrow].items = append(monkeys[toThrow].items, item)
+			}
+		}
+	}
+
+	var inspected []int
+	for _, monkey := range monkeys {
+		inspected = append(inspected, monkey.inspected)
+	}
+
+	return inspected
 }
 
 func parseMonkeys(lines []string) []Monkey {
@@ -78,42 +95,51 @@ func parseMonkeys(lines []string) []Monkey {
 
 	for i := 0; i <= len(lines)/7; i++ {
 		idx := i * 7
+		tstFunc, modulo := parseTest(lines[idx+3], lines[idx+4], lines[idx+5])
 		monkey := Monkey{
-			items: parseStartingItems(lines[idx+1]),
-			op:    parseOperation(lines[idx+2]),
-			test:  parseTest(lines[idx+3], lines[idx+4], lines[idx+5]),
+			items:  parseStartingItems(lines[idx+1]),
+			op:     parseOperation(lines[idx+2]),
+			test:   tstFunc,
+			modulo: modulo,
 		}
 		monkeys = append(monkeys, monkey)
 	}
 	return monkeys
 }
 
-func parseTest(testL, trueL, falseL string) func(current int) int {
+func parseTest(testL, trueL, falseL string) (func(uint64) int, int) {
 	divisible, _ := strconv.Atoi(testL[strings.LastIndex(testL, " ")+1:])
 	trueMonkey, _ := strconv.Atoi(trueL[strings.LastIndex(trueL, " ")+1:])
 	falseMonkey, _ := strconv.Atoi(falseL[strings.LastIndex(falseL, " ")+1:])
 
-	return func(current int) int {
-		if current%divisible == 0 {
+	return func(current uint64) int {
+		if current%uint64(divisible) == 0 {
 			return trueMonkey
 		}
 		return falseMonkey
-	}
+	}, divisible
 }
 
-func parseOperation(line string) func(current int) int {
+func parseOperation(line string) func(current uint64) uint64 {
 	i := strings.Index(line, "old ") + 4
 	operation := string(line[i])
-	value, err := strconv.Atoi(line[i+2:])
+	value, err := strconv.ParseUint(line[i+2:], 10, 64)
 	if err != nil {
-		value = -1
+		return func(current uint64) uint64 {
+			switch operation {
+			case "+":
+				return current + current
+			case "-":
+				return current - current
+			case "*":
+				return current * current
+			}
+
+			return current
+		}
 	}
 
-	return func(current int) int {
-		if value == -1 {
-			value = current
-		}
-
+	return func(current uint64) uint64 {
 		switch operation {
 		case "+":
 			return current + value
@@ -127,12 +153,12 @@ func parseOperation(line string) func(current int) int {
 	}
 }
 
-func parseStartingItems(line string) []int {
+func parseStartingItems(line string) []uint64 {
 	i := strings.Index(line, ":") + 2
 	arr := strings.Split(line[i:], ", ")
-	var items []int
+	var items []uint64
 	for _, item := range arr {
-		value, _ := strconv.Atoi(item)
+		value, _ := strconv.ParseUint(item, 10, 64)
 		items = append(items, value)
 	}
 	return items
