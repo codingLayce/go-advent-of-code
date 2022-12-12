@@ -27,8 +27,18 @@ var directions = []math.Vector2{
 }
 
 type Case struct {
-	value int32
-	pos   math.Vector2
+	value     int32
+	elevation int32
+	pos       math.Vector2
+	cost      int
+}
+
+func resetCosts(grid [][]*Case) {
+	for _, row := range grid {
+		for _, col := range row {
+			col.cost = 0
+		}
+	}
 }
 
 // To solve the puzzle 1 I'll use the A* Algorithm
@@ -39,77 +49,70 @@ func (d Day12) ProcessPuzzle1(lines []string) (string, error) {
 	start := getStart(grid)
 	end := getEnd(grid)
 
-	frontier := queue.NewPriorityQueue[Case]()
-	frontier.Push(start, 0)
-	path := make(map[Case]*Case) // Reverse path to get to the given case
-	path[start] = nil
-	costs := make(map[Case]int) // Best cost to get to the given case
-	costs[start] = 0
+	return fmt.Sprintf("%d", pathFinding(grid, start, end)), nil
+}
 
-	for !frontier.IsEmpty() {
-		current := frontier.Pop()
+func (d Day12) ProcessPuzzle2(lines []string) (string, error) {
+	grid := parseGrid(lines)
+	end := getEnd(grid)
 
-		if current.value == 'E' {
-			break
-		}
-
-		for _, next := range filterNeighbors(current.value, getNeighbors(grid, current.pos)) {
-			newCost := costs[current] + 1
-			if _, ok := path[next]; !ok || newCost < costs[start] {
-				costs[next] = newCost
-				priority := newCost + end.pos.DistanceManathan(current.pos)
-				frontier.Push(next, priority)
-				path[next] = &current
+	possibleStarts := []*Case{getStart(grid)}
+	for _, row := range grid {
+		for _, col := range row {
+			if col.value == 'a' {
+				possibleStarts = append(possibleStarts, col)
 			}
 		}
 	}
 
-	steps := 0
-	for current := path[end]; current != nil; {
-		steps++
-		current = path[*current]
-	}
-
-	return fmt.Sprintf("%d", steps), nil
-}
-
-func (d Day12) ProcessPuzzle2(lines []string) (string, error) {
-	return "not implemented", nil
-}
-
-func filterNeighbors(current int32, neighbors []Case) []Case {
-	if current == 'S' {
-		return neighbors
-	}
-
-	var filtered []Case
-	for _, neighbor := range neighbors {
-		if neighbor.value == 'E' && current == 'z' {
-			filtered = append(filtered, neighbor)
-			continue
-		}
-		if neighbor.value == current || neighbor.value == current+1 { // check if the neighbor is one level up
-			filtered = append(filtered, neighbor)
+	min := 999999999
+	for _, start := range possibleStarts {
+		resetCosts(grid)
+		cost := pathFinding(grid, start, end)
+		if cost < min && cost > 0 {
+			min = cost
 		}
 	}
 
-	return filtered
+	return fmt.Sprintf("%d", min), nil
 }
 
-func getNeighbors(grid [][]Case, pos math.Vector2) []Case {
-	var neighbors []Case
+func pathFinding(grid [][]*Case, start, end *Case) int {
+	frontier := queue.NewPriorityQueue[*Case]()
+	frontier.Push(start, 0)
+
+	for !frontier.IsEmpty() {
+		current := frontier.Pop()
+
+		for _, next := range getNeighbors(grid, current.pos) {
+			newCost := current.cost + 1
+			if next.cost == 0 || newCost < next.cost {
+				next.cost = newCost
+				priority := newCost + end.pos.DistanceManathan(next.pos)
+				frontier.Push(next, priority)
+			}
+		}
+	}
+
+	return end.cost
+}
+
+func getNeighbors(grid [][]*Case, pos math.Vector2) []*Case {
+	var neighbors []*Case
 	for _, direction := range directions {
 		lookup := pos.Add(direction)
 		if lookup.X < 0 || lookup.Y < 0 || lookup.Y >= len(grid) || lookup.X >= len(grid[0]) {
 			continue
 		}
-		neighbors = append(neighbors, grid[lookup.Y][lookup.X])
+		if grid[lookup.Y][lookup.X].elevation <= grid[pos.Y][pos.X].elevation+1 {
+			neighbors = append(neighbors, grid[lookup.Y][lookup.X])
+		}
 	}
 
 	return neighbors
 }
 
-func getStart(grid [][]Case) Case {
+func getStart(grid [][]*Case) *Case {
 	for _, row := range grid {
 		for _, col := range row {
 			if col.value == 'S' {
@@ -117,10 +120,10 @@ func getStart(grid [][]Case) Case {
 			}
 		}
 	}
-	return Case{}
+	return nil
 }
 
-func getEnd(grid [][]Case) Case {
+func getEnd(grid [][]*Case) *Case {
 	for _, row := range grid {
 		for _, col := range row {
 			if col.value == 'E' {
@@ -128,16 +131,22 @@ func getEnd(grid [][]Case) Case {
 			}
 		}
 	}
-	return Case{}
+	return nil
 }
 
-func parseGrid(lines []string) [][]Case {
-	var grid [][]Case
+func parseGrid(lines []string) [][]*Case {
+	var grid [][]*Case
 
 	for y, line := range lines {
-		var lineGrid []Case
+		var lineGrid []*Case
 		for x, char := range line {
-			lineGrid = append(lineGrid, Case{value: char, pos: math.NewVector2(x, y)})
+			tmp := char
+			if char == 'S' {
+				tmp = 'a'
+			} else if char == 'E' {
+				tmp = 'z'
+			}
+			lineGrid = append(lineGrid, &Case{value: char, pos: math.NewVector2(x, y), elevation: tmp - 'a'})
 		}
 		grid = append(grid, lineGrid)
 	}
