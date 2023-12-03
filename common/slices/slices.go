@@ -19,6 +19,17 @@ func Contains[T comparable](slice []T, element T) bool {
 	return false
 }
 
+func HasDuplicates[T comparable](slice []T) bool {
+	cache := make(map[T]struct{})
+	for _, value := range slice {
+		if _, ok := cache[value]; ok {
+			return true
+		}
+		cache[value] = struct{}{}
+	}
+	return false
+}
+
 func Sum(slice []int) int {
 	sum := 0
 	for _, e := range slice {
