@@ -1,13 +1,14 @@
 package day1
 
 import (
-	"advent/lib/slices"
 	"bufio"
 	"fmt"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
+
+	"advent/lib/slices"
 )
 
 func SolvePart1(reader *bufio.Scanner) (string, error) {
