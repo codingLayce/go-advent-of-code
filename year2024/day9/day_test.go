@@ -14,17 +14,17 @@ func TestSolvePart1(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "1928", answer)
 
-	/*answer, err = puzzle.Solve("testdata/input.txt", SolvePart1)
+	answer, err = puzzle.Solve("testdata/input.txt", SolvePart1)
 	require.NoError(t, err)
-	assert.Equal(t, "0", answer)*/
+	assert.Equal(t, "6448989155953", answer)
 }
 
 func TestSolvePart2(t *testing.T) {
 	answer, err := puzzle.Solve("testdata/example1.txt", SolvePart2)
 	require.NoError(t, err)
-	assert.Equal(t, "0", answer)
+	assert.Equal(t, "2858", answer)
 
 	answer, err = puzzle.Solve("testdata/input.txt", SolvePart2)
 	require.NoError(t, err)
-	assert.Equal(t, "0", answer)
+	assert.Equal(t, "6476642796832", answer)
 }
