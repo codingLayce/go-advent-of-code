@@ -23,6 +23,12 @@ func (v Vec2) Add(other Vec2) Vec2 {
 	return v
 }
 
+func (v Vec2) Minus(other Vec2) Vec2 {
+	v.X -= other.X
+	v.Y -= other.Y
+	return v
+}
+
 func (v Vec2) Mul(val int) Vec2 {
 	v.X *= val
 	v.Y *= val
