@@ -2,6 +2,13 @@ package vector
 
 import "math"
 
+var (
+	LeftDir   = NewVec2(0, -1)
+	RightDir  = NewVec2(0, 1)
+	TopDir    = NewVec2(-1, 0)
+	BottomDir = NewVec2(1, 0)
+)
+
 type Vec2 struct {
 	X int
 	Y int
