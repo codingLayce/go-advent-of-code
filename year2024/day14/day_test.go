@@ -10,26 +10,21 @@ import (
 )
 
 func TestSolvePart1(t *testing.T) {
-	tilesWidth = 11
-	tilesHeight = 7
-
 	answer, err := puzzle.Solve("testdata/example1.txt", SolvePart1)
 	require.NoError(t, err)
-	assert.Equal(t, "12", answer)
-
-	tilesWidth = 101
-	tilesHeight = 103
+	assert.Equal(t, "", answer)
 
 	answer, err = puzzle.Solve("testdata/input.txt", SolvePart1)
 	require.NoError(t, err)
-	assert.Equal(t, "225648864", answer)
+	assert.Equal(t, "", answer)
 }
 
 func TestSolvePart2(t *testing.T) {
-	tilesWidth = 101
-	tilesHeight = 103
-
-	answer, err := puzzle.Solve("testdata/input.txt", SolvePart2)
+	answer, err := puzzle.Solve("testdata/example1.txt", SolvePart2)
 	require.NoError(t, err)
-	assert.Equal(t, "7847", answer)
+	assert.Equal(t, "", answer)
+
+	answer, err = puzzle.Solve("testdata/input.txt", SolvePart2)
+	require.NoError(t, err)
+	assert.Equal(t, "", answer)
 }
